@@ -1,0 +1,96 @@
+﻿@model PaginatedList<LojaVirtual.Models.Product>
+
+@{
+    ViewData["Title"] = "Produtos";
+}
+<div class="col-lg-12">
+    <form asp-action="Index" method="get">
+        <div class="form-actions no-color">
+            <p>
+                <select id="filtroAtual" name="filtroAtual">
+
+                    @{
+
+                        switch (ViewData["filtro"])
+                        {
+                            case "MenorPreco":
+                                var caseMenorPreco = ViewData["filtro"].ToString() == "MenorPreco" ? "selected" : "";
+                                <option value="MenorPreco" caseMenorPreco>Menor Preço</option>
+                                break;
+
+                            case "MaiorPreco":
+                                var caseMaiorPreco = ViewData["filtro"].ToString() == "MaiorPreco" ? "selected" : "";
+                                <option value="MaiorPreco" caseMaiorPreco>Maior Preço</option>
+                                break;
+                            case "Novidades":
+                                var Novidades = ViewData["filtro"].ToString() == "Novidades" ? "selected" : "";
+                                <option value="Novidades" Novidades>Novidades</option>
+                                break;
+                        }
+
+                        <option value="MenorPreco" caseMenorPreco>Menor Preço</option>
+                        <option value="MaiorPreco" caseMaiorPreco>Maior Preço</option>
+                        <option value="Novidades" Novidades>Novidades</option>
+
+
+                    }
+
+                </select>
+                <input type="submit" value="OK" />
+            </p>
+        </div>
+    </form><br />
+</div>
+
+<div class="container">
+    <div class="row">
+        @foreach (var item in Model)
+        {
+            <div class="col-lg-3">
+                @if (item.ImageProducts == null)
+                {
+                    <a href="@Url.Action("Details", "Products" , new { Id=item.Id })">
+                        <img class="card-img-top" src="~/photos/nophoto.png" alt="Imagem de capa do card">
+                    </a>
+                }
+                else
+                {
+                    <a href="@Url.Action("Details", "Products" , new { Id=item.Id })">
+                        <img class="card-img-top" src="~/photos/@item.ImageProducts.First().Image"  data-interval="5000" alt="Imagem de capa do Produto">
+                    </a>
+                }
+                <div class="card-body">
+                    <p class="card-text"><strong>@item.Brand.Name</strong></p>
+                    <p class="card-text"><small>@item.Name</small></p>
+                    <p class="card-text"><strong>R$ @item.Price</strong></p>
+                </div>
+            </div>
+        }
+    </div>
+
+</div>
+
+
+@{
+    var prevDisabled = !Model.HasPreviousPage ? "disabled" : "";
+    var nextDisabled = !Model.HasNextPage ? "disabled" : "";
+}
+<div class="col-lg-12">
+    <nav aria-label="Navegação de página exemplo">
+        <ul class="pagination">
+            <li class="page-item"><a asp-action="Index" asp-route-pagina="@(Model.PageIndex - 1)" asp-route-filtroAtual="@ViewData[" filtro"]" class="btn btn-light btn-link @prevDisabled">Anterior</a></li>
+
+            @for (int i = 1; i < Model.TotalPages; i++)
+            {
+                <li class="page-item"><a class="page-link" href="?pagina=@i">@i</a></li>
+            }
+
+
+            <li class="page-item"><a asp-action="Index" asp-route-pagina="@(Model.PageIndex + 1 )" asp-route-filtroAtual="@ViewData[" filtro"]" class="btn btn-light btn-link @nextDisabled">Próximo</a></li>
+        </ul>
+    </nav>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
